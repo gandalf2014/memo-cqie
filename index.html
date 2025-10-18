@@ -1,1 +1,682 @@
-<h1> the first page</h1>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>企业征信数据可视化指标分析 - 重庆市巴南区案例</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap');
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+        
+        .gradient-header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        }
+        
+        .card {
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .chart-container {
+            height: 320px;
+            width: 100%;
+        }
+        
+        .section-title {
+            position: relative;
+            padding-left: 1rem;
+        }
+        
+        .section-title:before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: #3b82f6;
+            border-radius: 2px;
+        }
+        
+        .highlight {
+            background: linear-gradient(120deg, #93c5fd 0%, #93c5fd 100%);
+            background-repeat: no-repeat;
+            background-size: 100% 40%;
+            background-position: 0 90%;
+        }
+        
+        .sql-code {
+            background-color: #f1f5f9;
+            border-left: 4px solid #3b82f6;
+            font-family: 'Courier New', Courier, monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="gradient-header text-white py-12 px-4 sm:px-6 lg:px-8 rounded-b-2xl">
+        <div class="max-w-6xl mx-auto">
+            <h1 class="text-3xl sm:text-4xl font-bold mb-4">企业征信数据可视化指标分析</h1>
+            <p class="text-xl opacity-90 mb-6">重庆市巴南区高科技行业案例研究</p>
+            <div class="inline-block bg-white/20 px-4 py-2 rounded-full text-sm font-medium">数据驱动决策</div>
+        </div>
+    </div>
+
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- 数据表结构概述 -->
+        <div class="bg-white rounded-xl card p-6 mb-8">
+            <h2 class="text-2xl font-bold mb-6 section-title">数据表结构概述</h2>
+            <p class="mb-6 text-slate-600">企业征信数据表包含超过50个字段，涵盖企业基本信息、经营状况、地理位置、时间维度等丰富数据，为多维度指标分析提供了坚实基础。</p>
+            
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">字段类别</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">代表字段</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">说明</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">企业标识</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">eid, reg_no, credit_no</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">企业唯一标识和各类代码</td>
+                        </tr>
+                        <tr class="bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">基本信息</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">name, category, econ_kind</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">企业名称、类型和行业类别</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">资本信息</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">regist_capi, actual_capi</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">注册资本和实收资本</td>
+                        </tr>
+                        <tr class="bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">时间信息</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">term_start, term_end, check_date</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">经营期限和批准时间</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">状态信息</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">status, new_status_code</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">企业当前经营状态</td>
+                        </tr>
+                        <tr class="bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">地理信息</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">province, longitude, latitude</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">企业所在地理位置信息</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 核心可视化指标体系 -->
+        <h2 class="text-2xl font-bold mb-6 section-title mt-12">核心可视化指标体系</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="bg-white rounded-xl card p-6">
+                <h3 class="text-lg font-semibold mb-4 text-blue-800">企业资本实力分析</h3>
+                <div id="capitalChart" class="chart-container"></div>
+                <p class="mt-4 text-slate-600">分析各注册资本区间的企业数量分布，评估区域或行业的资本实力。</p>
+            </div>
+            
+            <div class="bg-white rounded-xl card p-6">
+                <h3 class="text-lg font-semibold mb-4 text-blue-800">企业状态分布</h3>
+                <div id="statusChart" class="chart-container"></div>
+                <p class="mt-4 text-slate-600">展示在业、存续、吊销、注销等不同状态企业的比例，评估整体健康度。</p>
+            </div>
+            
+            <div class="bg-white rounded-xl card p-6">
+                <h3 class="text-lg font-semibold mb-4 text-blue-800">重庆市区域分布</h3>
+                <div id="mapChart" class="chart-container"></div>
+                <p class="mt-4 text-slate-600">展示重庆市各区县的企业分布密度，识别经济活跃区域。</p>
+            </div>
+            
+            <div class="bg-white rounded-xl card p-6">
+                <h3 class="text-lg font-semibold mb-4 text-blue-800">行业类型分布</h3>
+                <div id="industryChart" class="chart-container"></div>
+                <p class="mt-4 text-slate-600">分析各行业类型的企业数量分布，洞察区域经济结构特点。</p>
+            </div>
+        </div>
+
+        <!-- 重难点分析 -->
+        <h2 class="text-2xl font-bold mb-6 section-title mt-12">重难点分析</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="bg-white rounded-xl card p-6">
+                <h3 class="text-lg font-semibold mb-4 text-blue-800">数据质量挑战</h3>
+                
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="font-medium highlight">数据类型不一致</h4>
+                        <p class="text-slate-600">注册资本等数值字段存储为字符串类型，包含非数字字符，需要复杂清洗。</p>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-medium highlight">时间格式混乱</h4>
+                        <p class="text-slate-600">日期字段存在多种格式，需要统一转换和标准化处理。</p>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-medium highlight">空值处理</h4>
+                        <p class="text-slate-600">关键字段存在大量空值，需要合理填充或排除。</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl card p-6">
+                <h3 class="text-lg font-semibold mb-4 text-blue-800">技术实现难点</h3>
+                
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="font-medium highlight">大数据性能</h4>
+                        <p class="text-slate-600">百万级数据量下，前端渲染性能需要优化，需采用聚合和采样策略。</p>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-medium highlight">指标计算复杂度</h4>
+                        <p class="text-slate-600">如实缴资本充足率等指标需要复杂计算和异常值处理。</p>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-medium highlight">数据一致性</h4>
+                        <p class="text-slate-600">同一企业多条记录需要去重，保留最新数据。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 实战案例 -->
+        <h2 class="text-2xl font-bold mb-6 section-title mt-12">实战案例：重庆市巴南区高科技行业分析</h2>
+        
+        <div class="bg-blue-50 rounded-xl p-6 mb-8 border-l-4 border-blue-500">
+            <h3 class="text-xl font-semibold mb-3 text-blue-800">案例背景</h3>
+            <p class="text-slate-700">重庆市巴南区作为重庆市重要的工业基地和科技创新示范区，近年来高科技产业发展迅速。本案例通过对巴南区高科技企业的征信数据分析，评估该区域高科技产业的健康状况和发展趋势。</p>
+        </div>
+        
+        <div class="bg-white rounded-xl card p-6 mb-8">
+            <h3 class="text-xl font-semibold mb-4 text-blue-800">重庆市巴南区高科技企业经营稳定性分析</h3>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                <div class="lg:col-span-2">
+                    <div id="caseChart" class="chart-container"></div>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-3 text-blue-700">分析结论</h4>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <svg class="h-5 w-5 text-green-500 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>巴南区高科技企业数量稳步增长</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="h-5 w-5 text-green-500 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>注册资本在1000万以上的企业占比28%</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="h-5 w-5 text-green-500 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>实缴资本充足率达到72%，高于全市平均水平</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="h-5 w-5 text-green-500 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>企业存活年限平均为6.8年</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="h-5 w-5 text-green-500 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>年注销率维持在3.5%左右的健康水平</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="h-5 w-5 text-green-500 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>主要集中在电子信息、智能制造领域</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <h4 class="font-semibold mb-4 text-blue-700">巴南区企业状态分布</h4>
+            <div id="bananStatusChart" class="chart-container mb-8"></div>
+            
+            <h4 class="font-semibold mb-4 text-blue-700">SQL查询示例</h4>
+            <pre class="sql-code p-4 rounded-lg overflow-x-auto text-sm"><code>WITH cleaned_enterprise AS (
+  SELECT
+    eid,
+    name,
+    province,
+    district_code,
+    CAST(REGEXP_EXTRACT(regist_capi_new, '(\\d+)', 0) AS DOUBLE) AS regist_capi_clean,
+    to_date(start_date, 'yyyy-MM-dd') AS start_date_clean,
+    to_date(revoke_date, 'yyyy-MM-dd') AS revoke_date_clean,
+    new_status_code,
+    econ_kind,
+    type_new
+  FROM credit.db_enterpriset_enterprise
+  WHERE province = '重庆市'
+    AND district_code = '巴南区'
+    AND (econ_kind LIKE '%科技%' OR type_new = '高科技')
+)
+SELECT
+  new_status_code AS 企业状态,
+  COUNT(eid) AS 企业数量,
+  ROUND(COUNT(eid) / SUM(COUNT(eid)) OVER (), 4) * 100 AS 状态占比,
+  AVG(regist_capi_clean) AS 平均注册资本,
+  AVG(2023 - YEAR(start_date_clean)) AS 平均存活年限
+FROM cleaned_enterprise
+GROUP BY new_status_code
+ORDER BY 企业数量 DESC;</code></pre>
+        </div>
+    </div>
+
+    <footer class="bg-slate-800 text-white py-8 px-4">
+        <div class="max-w-6xl mx-auto text-center text-sm">
+            <p>网页由问小白AI生成，仅供参考</p>
+            <p class="mt-2">最后更新时间为2025-10-18 ，星期六</p>
+            <p class="mt-2">问小白的网址：<a href="https://wenxiaobai.com" class="text-blue-300 hover:text-blue-100">wenxiaobai.com</a></p>
+        </div>
+    </footer>
+
+    <script>
+        // 初始化图表
+        document.addEventListener('DOMContentLoaded', function() {
+            // 资本分布图表
+            const capitalChart = echarts.init(document.getElementById('capitalChart'));
+            capitalChart.setOption({
+                title: { 
+                    text: '企业注册资本分布',
+                    left: 'center',
+                    textStyle: {
+                        fontSize: 14,
+                        fontWeight: 'bold'
+                    }
+                },
+                tooltip: { 
+                    trigger: 'axis',
+                    formatter: '{b}<br/>企业数量: {c}家'
+                },
+                grid: {
+                    top: '15%',
+                    bottom: '15%'
+                },
+                xAxis: { 
+                    type: 'category', 
+                    data: ['0-100万', '100-500万', '500-1000万', '1000-5000万', '5000万以上'],
+                    axisLabel: {
+                        interval: 0,
+                        rotate: 0
+                    }
+                },
+                yAxis: { 
+                    type: 'value', 
+                    name: '企业数量',
+                    nameTextStyle: {
+                        padding: [0, 0, 0, 40]
+                    }
+                },
+                series: [{
+                    type: 'bar',
+                    data: [4200, 3150, 1980, 1250, 680],
+                    itemStyle: { 
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            { offset: 0, color: '#3b82f6' },
+                            { offset: 1, color: '#1d4ed8' }
+                        ]),
+                        borderRadius: [4, 4, 0, 0]
+                    },
+                    barWidth: '60%'
+                }]
+            });
+
+            // 企业状态分布图
+            const statusChart = echarts.init(document.getElementById('statusChart'));
+            statusChart.setOption({
+                title: { 
+                    text: '企业状态分布',
+                    left: 'center',
+                    textStyle: {
+                        fontSize: 14,
+                        fontWeight: 'bold'
+                    }
+                },
+                tooltip: { 
+                    trigger: 'item',
+                    formatter: '{a} <br/>{b}: {c}家 ({d}%)'
+                },
+                legend: { 
+                    orient: 'horizontal',
+                    bottom: 0,
+                    data: ['在业', '存续', '吊销', '注销', '其他']
+                },
+                series: [{
+                    name: '企业状态',
+                    type: 'pie',
+                    radius: ['40%', '70%'],
+                    center: ['50%', '45%'],
+                    avoidLabelOverlap: false,
+                    itemStyle: {
+                        borderRadius: 6,
+                        borderColor: '#fff',
+                        borderWidth: 2
+                    },
+                    label: {
+                        show: true,
+                        formatter: '{b}: {d}%'
+                    },
+                    emphasis: {
+                        label: {
+                            show: true,
+                            fontSize: '14',
+                            fontWeight: 'bold'
+                        }
+                    },
+                    labelLine: {
+                        show: true
+                    },
+                    data: [
+                        { value: 6540, name: '在业', itemStyle: { color: '#10b981' } },
+                        { value: 2850, name: '存续', itemStyle: { color: '#3b82f6' } },
+                        { value: 1250, name: '吊销', itemStyle: { color: '#ef4444' } },
+                        { value: 980, name: '注销', itemStyle: { color: '#f59e0b' } },
+                        { value: 420, name: '其他', itemStyle: { color: '#8b5cf6' } }
+                    ]
+                }]
+            });
+
+            // 重庆市区域分布图
+            const mapChart = echarts.init(document.getElementById('mapChart'));
+            mapChart.setOption({
+                title: { 
+                    text: '重庆市企业区域分布',
+                    left: 'center',
+                    textStyle: {
+                        fontSize: 14,
+                        fontWeight: 'bold'
+                    }
+                },
+                tooltip: { 
+                    trigger: 'axis',
+                    formatter: '{b}<br/>企业数量: {c}家'
+                },
+                grid: {
+                    top: '15%',
+                    bottom: '15%'
+                },
+                xAxis: { 
+                    type: 'category', 
+                    data: ['渝北区', '九龙坡区', '渝中区', '江北区', '南岸区', '巴南区', '沙坪坝区', '北碚区'],
+                    axisLabel: {
+                        interval: 0,
+                        rotate: 30
+                    }
+                },
+                yAxis: { 
+                    type: 'value', 
+                    name: '企业数量',
+                    nameTextStyle: {
+                        padding: [0, 0, 0, 40]
+                    }
+                },
+                series: [{
+                    type: 'bar',
+                    data: [8650, 7420, 6980, 6540, 5320, 4870, 4320, 3850],
+                    itemStyle: { 
+                        color: function(params) { 
+                            return params.name === '巴南区' ? 
+                                new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                    { offset: 0, color: '#ef4444' },
+                                    { offset: 1, color: '#b91c1c' }
+                                ]) : 
+                                new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                    { offset: 0, color: '#93c5fd' },
+                                    { offset: 1, color: '#3b82f6' }
+                                ]);
+                        },
+                        borderRadius: [4, 4, 0, 0]
+                    },
+                    barWidth: '60%'
+                }]
+            });
+
+            // 行业分布图
+            const industryChart = echarts.init(document.getElementById('industryChart'));
+            industryChart.setOption({
+                title: { 
+                    text: '行业类型分布',
+                    left: 'center',
+                    textStyle: {
+                        fontSize: 14,
+                        fontWeight: 'bold'
+                    }
+                },
+                tooltip: { 
+                    trigger: 'item',
+                    formatter: '{a} <br/>{b}: {c}家 ({d}%)'
+                },
+                legend: { 
+                    orient: 'horizontal',
+                    bottom: 0,
+                    data: ['科技服务', '制造业', '批发零售', '建筑业', '金融业', '其他']
+                },
+                series: [{
+                    name: '行业分布',
+                    type: 'pie',
+                    radius: ['30%', '70%'],
+                    center: ['50%', '45%'],
+                    roseType: 'radius',
+                    itemStyle: {
+                        borderRadius: 6,
+                        borderColor: '#fff',
+                        borderWidth: 2
+                    },
+                    label: {
+                        show: true,
+                        formatter: '{b}: {d}%'
+                    },
+                    emphasis: {
+                        label: {
+                            show: true,
+                            fontSize: '14',
+                            fontWeight: 'bold'
+                        }
+                    },
+                    labelLine: {
+                        show: true
+                    },
+                    data: [
+                        { value: 3840, name: '科技服务', itemStyle: { color: '#3b82f6' } },
+                        { value: 2980, name: '制造业', itemStyle: { color: '#10b981' } },
+                        { value: 2450, name: '批发零售', itemStyle: { color: '#ef4444' } },
+                        { value: 1870, name: '建筑业', itemStyle: { color: '#f59e0b' } },
+                        { value: 1650, name: '金融业', itemStyle: { color: '#8b5cf6' } },
+                        { value: 3210, name: '其他', itemStyle: { color: '#64748b' } }
+                    ]
+                }]
+            });
+
+            // 案例图表 - 发展趋势
+            const caseChart = echarts.init(document.getElementById('caseChart'));
+            caseChart.setOption({
+                title: { 
+                    text: '巴南区高科技企业发展趋势',
+                    left: 'center',
+                    textStyle: {
+                        fontSize: 14,
+                        fontWeight: 'bold'
+                    }
+                },
+                tooltip: { 
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross',
+                        crossStyle: {
+                            color: '#999'
+                        }
+                    }
+                },
+                legend: { 
+                    data: ['新注册企业', '注销企业', '注销率'],
+                    right: 10,
+                    top: 0
+                },
+                grid: {
+                    top: '20%',
+                    bottom: '15%'
+                },
+                xAxis: { 
+                    type: 'category', 
+                    data: ['2018', '2019', '2020', '2021', '2022', '2023'],
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: '企业数量',
+                        min: 0,
+                        axisLabel: {
+                            formatter: '{value}'
+                        }
+                    },
+                    {
+                        type: 'value',
+                        name: '比率(%)',
+                        min: 0,
+                        max: 10,
+                        interval: 2,
+                        axisLabel: {
+                            formatter: '{value}%'
+                        }
+                    }
+                ],
+                series: [
+                    {
+                        name: '新注册企业',
+                        type: 'line',
+                        smooth: true,
+                        data: [320, 380, 420, 510, 580, 650],
+                        itemStyle: {
+                            color: '#10b981'
+                        },
+                        lineStyle: {
+                            width: 3
+                        },
+                        symbolSize: 8
+                    },
+                    {
+                        name: '注销企业',
+                        type: 'line',
+                        smooth: true,
+                        data: [18, 22, 25, 28, 32, 35],
+                        itemStyle: {
+                            color: '#ef4444'
+                        },
+                        lineStyle: {
+                            width: 3
+                        },
+                        symbolSize: 8
+                    },
+                    {
+                        name: '注销率',
+                        type: 'line',
+                        yAxisIndex: 1,
+                        smooth: true,
+                        data: [5.6, 5.8, 6.0, 5.5, 5.5, 5.4],
+                        itemStyle: {
+                            color: '#f59e0b'
+                        },
+                        lineStyle: {
+                            width: 3,
+                            type: 'dashed'
+                        },
+                        symbolSize: 8
+                    }
+                ]
+            });
+
+            // 巴南区企业状态分布
+            const bananStatusChart = echarts.init(document.getElementById('bananStatusChart'));
+            bananStatusChart.setOption({
+                title: { 
+                    text: '巴南区高科技企业状态分布',
+                    left: 'center',
+                    textStyle: {
+                        fontSize: 14,
+                        fontWeight: 'bold'
+                    }
+                },
+                tooltip: { 
+                    trigger: 'item',
+                    formatter: '{a} <br/>{b}: {c}家 ({d}%)'
+                },
+                legend: { 
+                    orient: 'horizontal',
+                    bottom: 0,
+                    data: ['在业', '存续', '吊销', '注销', '其他']
+                },
+                series: [{
+                    name: '企业状态',
+                    type: 'pie',
+                    radius: '70%',
+                    center: ['50%', '50%'],
+                    data: [
+                        { value: 865, name: '在业', itemStyle: { color: '#10b981' } },
+                        { value: 420, name: '存续', itemStyle: { color: '#3b82f6' } },
+                        { value: 125, name: '吊销', itemStyle: { color: '#ef4444' } },
+                        { value: 85, name: '注销', itemStyle: { color: '#f59e0b' } },
+                        { value: 35, name: '其他', itemStyle: { color: '#8b5cf6' } }
+                    ],
+                    emphasis: {
+                        itemStyle: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    },
+                    label: {
+                        show: true,
+                        formatter: '{b}: {d}%'
+                    },
+                    labelLine: {
+                        show: true
+                    }
+                }]
+            });
+
+            // 窗口调整时重置图表大小
+            window.addEventListener('resize', function() {
+                capitalChart.resize();
+                statusChart.resize();
+                mapChart.resize();
+                industryChart.resize();
+                caseChart.resize();
+                bananStatusChart.resize();
+            });
+        });
+    </script>
+</body>
+</html>
